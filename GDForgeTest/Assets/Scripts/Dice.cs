@@ -17,6 +17,7 @@ public class Dice : MonoBehaviour
     private bool _dieIsThrown = false;
 
     public event Action OnResultIsChanged;
+    public event Action OnDiceThrown;
 
     public string DiceRollResult => _diceRollResult;
     public float ThrowDuration => _throwDuration;
@@ -48,6 +49,7 @@ public class Dice : MonoBehaviour
 
     private IEnumerator RollTheDice()
     {
+        OnDiceThrown?.Invoke();
         _dieIsThrown = true;
         int randomDiceSide = 0;
 

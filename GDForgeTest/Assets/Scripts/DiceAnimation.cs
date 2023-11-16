@@ -8,7 +8,6 @@ public class DiceAnimation : MonoBehaviour
     [SerializeField] private float _size;
     [SerializeField] private float _durationScale;
     [SerializeField] private Transform[] _movePoints;
-    [SerializeField] private PlayerInputController _playerInput;
     [SerializeField] private int _numberOfSpins;
     [SerializeField] private GameObject _spinEffect;
     [SerializeField] private GameObject _boostEffect;
@@ -23,13 +22,13 @@ public class DiceAnimation : MonoBehaviour
 
     private void OnEnable()
     {
-        _playerInput.OnRollTheDiced += DiceMoveAnimation;
+        _dice.OnDiceThrown += DiceMoveAnimation;
         Booster.OnBoostEffectActivated += ActivateBoostEffect;
     }
 
     private void OnDisable()
     {
-        _playerInput.OnRollTheDiced -= DiceMoveAnimation;
+        _dice.OnDiceThrown -= DiceMoveAnimation;
         Booster.OnBoostEffectActivated -= ActivateBoostEffect;
     }
 
@@ -49,13 +48,10 @@ public class DiceAnimation : MonoBehaviour
 
     private void DiceMoveAnimation()
     {
-        if (!_dice.DieIsThrown)
-        {
-            transform.DOPath(ConvertTransformToVector3(_movePoints), _dice.ThrowDuration, PathType.CatmullRom);
-            transform.DORotate(new Vector3(0, 0, 360 * _numberOfSpins), _dice.ThrowDuration, RotateMode.FastBeyond360);
+        transform.DOPath(ConvertTransformToVector3(_movePoints), _dice.ThrowDuration, PathType.CatmullRom);
+        transform.DORotate(new Vector3(0, 0, 360 * _numberOfSpins), _dice.ThrowDuration, RotateMode.FastBeyond360);
 
-            StartCoroutine(ActivateSpinEffect());
-        }
+        StartCoroutine(ActivateSpinEffect());
     }
 
     private IEnumerator ActivateSpinEffect()
