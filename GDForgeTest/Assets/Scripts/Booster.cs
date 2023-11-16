@@ -15,11 +15,13 @@ public class Booster : MonoBehaviour
     private void OnEnable()
     {
         _playerInput.OnBoosted += Boost;
+        _playerInput.OnRollTheDiced += ActivateBoostButton;
     }
 
     private void OnDisable()
     {
         _playerInput.OnBoosted += Boost;
+        _playerInput.OnRollTheDiced -= ActivateBoostButton;
     }
 
     private void Boost()
@@ -30,7 +32,6 @@ public class Booster : MonoBehaviour
             OnBoosted?.Invoke(count.ToString(), count);
             OnBoostEffectActivated?.Invoke();
             _isBoosted = true;
-            StartCoroutine(ActivateBoostButton());
         }
     }
 
@@ -39,9 +40,8 @@ public class Booster : MonoBehaviour
         return (!_isBoosted && !_dice.DieIsThrown && _dice.DiceRollResult != "20" && _dice.DiceRollResult != null);
     }
 
-    private IEnumerator ActivateBoostButton()
+    private void ActivateBoostButton()
     {
-        yield return new WaitForSeconds(_dice.ThrowDuration);
         _isBoosted = false;
     }
 }
