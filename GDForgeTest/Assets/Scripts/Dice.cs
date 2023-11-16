@@ -9,6 +9,8 @@ public class Dice : MonoBehaviour
 {
     [SerializeField] private Sprite[] _sides;
     [SerializeField] private PlayerInputController _playerInput;
+    [SerializeField] private float _throwDuration;
+    [SerializeField] private float _scrollFrequency = 0.05f;
 
     private Image _image;
     private string _diceRollResult;
@@ -17,6 +19,9 @@ public class Dice : MonoBehaviour
     public event Action OnResultIsChanged;
 
     public string DiceRollResult => _diceRollResult;
+    public float ThrowDuration => _throwDuration;
+
+    public bool DieIsThrown => _dieIsThrown;
 
     private void Awake()
     {
@@ -26,11 +31,13 @@ public class Dice : MonoBehaviour
     private void OnEnable()
     {
         _playerInput.OnRollTheDiced += TryRollingTheDice;
+        Booster.OnBoosted += ChangeResult;
     }
 
     private void OnDisable()
     {
         _playerInput.OnRollTheDiced -= TryRollingTheDice;
+        Booster.OnBoosted -= ChangeResult;
     }
 
     private void TryRollingTheDice()
@@ -44,15 +51,22 @@ public class Dice : MonoBehaviour
         _dieIsThrown = true;
         int randomDiceSide = 0;
 
-        for (int i = 0; i < 20; i++)
+        for (int i = 0; i < _throwDuration/_scrollFrequency; i++)
         {
             randomDiceSide = Random.Range(0, _sides.Length);
             _image.sprite = _sides[randomDiceSide];
-            yield return new WaitForSeconds(0.05f);
+            yield return new WaitForSeconds(_scrollFrequency);
         }
 
         _diceRollResult = _sides[randomDiceSide].name;
         OnResultIsChanged?.Invoke();
         _dieIsThrown = false;
+    }
+
+    private void ChangeResult(string newResult, int diceSide)
+    {
+        _diceRollResult = newResult;
+        _image.sprite = _sides[diceSide-1];
+        OnResultIsChanged?.Invoke();
     }
 }
